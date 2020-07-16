@@ -11,6 +11,7 @@ import android.net.Uri
 import android.os.Build
 import android.os.Bundle
 import android.view.View
+import android.view.View.GONE
 import android.view.View.VISIBLE
 import android.widget.MediaController
 import android.widget.Toast
@@ -110,6 +111,34 @@ class MainActivity : AppCompatActivity() {
             videoView.requestFocus()
             videoView.start()
             output.delete()
+        }
+    }
+
+    override fun onPause() {
+        super.onPause()
+        val output = File(root, fileNameDecrypt)
+        if (output.exists()){
+            output.delete()
+        }
+
+    }
+
+    override fun onStart() {
+        super.onStart()
+        val output = File(root, fileNameDecrypt)
+        val input = File(root, fileNameEncrypt)
+        if (input.exists()){
+            loading.visibility = VISIBLE
+            val decryptOutputFile: OutputStream = FileOutputStream(output)
+            val encryptInputFile : InputStream = FileInputStream(input)
+            MyEncrypter.decryptToFile(
+                    key, specString,
+                    encryptInputFile,decryptOutputFile
+            )
+            loading.visibility = GONE
+            videoView.setVideoURI(Uri.fromFile(output))
+            videoView.requestFocus()
+            videoView.start()
         }
     }
 }
