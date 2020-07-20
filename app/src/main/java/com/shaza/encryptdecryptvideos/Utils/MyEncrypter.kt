@@ -1,6 +1,5 @@
 package com.shaza.encryptdecryptvideos.Utils
 
-import java.io.File
 import java.io.IOException
 import java.io.InputStream
 import java.io.OutputStream
@@ -21,34 +20,33 @@ object MyEncrypter {
     private val algoVideoEncryptor = "AES/CBC/PKCS5Padding"
     private val algoSecretKey = "AES"
 
-    @Throws(NoSuchAlgorithmException::class,
-    NoSuchPaddingException::class,
-    InvalidKeyException::class,
-    IOException::class,
-    InvalidAlgorithmParameterException::class)
-    fun encryptToFile(key:String,spec:String, inputStream: InputStream,outputStream: OutputStream, pathToFile:String){
+    @Throws(
+        NoSuchAlgorithmException::class,
+        NoSuchPaddingException::class,
+        InvalidKeyException::class,
+        IOException::class,
+        InvalidAlgorithmParameterException::class
+    )
+    fun encryptToFile(
+        key: String,
+        spec: String,
+        inputStream: InputStream,
+        outputStream: OutputStream
+    ) {
         var outputStream = outputStream
         try {
             val iv = IvParameterSpec(spec.toByteArray(charset("UTF-8")))
             val keySpec = SecretKeySpec(key.toByteArray(charset("UTF-8")), algoSecretKey)
             val c = Cipher.getInstance(algoVideoEncryptor)
-            c.init(Cipher.ENCRYPT_MODE,keySpec,iv)
-            outputStream = CipherOutputStream(outputStream,c)
+            c.init(Cipher.ENCRYPT_MODE, keySpec, iv)
+            outputStream = CipherOutputStream(outputStream, c)
             val buffer = ByteArray(defaultReadWriteBlockBufferSize)
             var bytesRead: Int = 0
-            while (inputStream.read(buffer).also { bytesRead = it } > 0){
+            while (inputStream.read(buffer).also { bytesRead = it } > 0) {
                 outputStream.write(buffer,0,bytesRead)
             }
         } finally {
             outputStream.close()
-            val fdelete = File(pathToFile)
-            if (fdelete.exists()) {
-                if (fdelete.delete()) {
-                    System.out.println(pathToFile)
-                } else {
-                    System.out.println(pathToFile)
-                }
-            }
         }
     }
 
