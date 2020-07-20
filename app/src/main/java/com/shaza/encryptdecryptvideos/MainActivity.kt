@@ -41,10 +41,10 @@ class MainActivity : AppCompatActivity() {
         private val specString = "oCmvxdqMc7Ven1p1"
     }
 
-    private val storage_permission_code = 1
+    private val storagePermissionCode = 1
     lateinit var root: String
-    lateinit var dispatcher: FirebaseJobDispatcher
-    lateinit var job: Job
+    private lateinit var dispatcher: FirebaseJobDispatcher
+    private lateinit var job: Job
 
     @SuppressLint("ClickableViewAccessibility")
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -87,7 +87,10 @@ class MainActivity : AppCompatActivity() {
     private fun checkPermission(){
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M){
             if (checkSelfPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_DENIED){
-                requestPermissions(arrayOf(Manifest.permission.WRITE_EXTERNAL_STORAGE),storage_permission_code)
+                requestPermissions(
+                    arrayOf(Manifest.permission.WRITE_EXTERNAL_STORAGE),
+                    storagePermissionCode
+                )
             }else{
                 startDownloading()
             }
@@ -97,6 +100,10 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun startDownloading() {
+        val output = File(root, fileNameDecrypt)
+        if (output.exists()) {
+            output.delete()
+        }
         val url =
             "http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4"
         val request = DownloadManager.Request(Uri.parse(url))
@@ -117,11 +124,11 @@ class MainActivity : AppCompatActivity() {
 
     override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>, grantResults: IntArray) {
         when(requestCode){
-            storage_permission_code ->{
-                if (grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED ){
+            storagePermissionCode -> {
+                if (grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                     startDownloading()
-                }else{
-                    Toast.makeText(this,"download denied", Toast.LENGTH_LONG).show()
+                } else {
+                    Toast.makeText(this, "download denied", Toast.LENGTH_LONG).show()
                 }
             }
         }
@@ -140,8 +147,8 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    override fun onPause() {
-        super.onPause()
+    override fun onStop() {
+        super.onStop()
         val output = File(root, fileNameDecrypt)
         if (output.exists()) {
             output.delete()
@@ -149,8 +156,8 @@ class MainActivity : AppCompatActivity() {
 
     }
 
-    override fun onResume() {
-        super.onResume()
+    override fun onStart() {
+        super.onStart()
         val output = File(root, fileNameDecrypt)
         val input = File(root, fileNameEncrypt)
         if (input.exists()) {
@@ -233,6 +240,7 @@ class MainActivity : AppCompatActivity() {
         workManger.getWorkInfoByIdLiveData(task.id).observe(this, androidx.lifecycle.Observer {
             if (it.state.isFinished) {
                 Log.v("job", "finished")
+                Toast.makeText(applicationContext, "Video ready to view", Toast.LENGTH_LONG).show()
                 playVideo()
             }
         })

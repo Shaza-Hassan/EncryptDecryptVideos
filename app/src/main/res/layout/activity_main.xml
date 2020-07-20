@@ -18,14 +18,16 @@
         android:onClick="download"/>
 
     <ProgressBar
-        android:layout_width="wrap_content"
+        style="?android:attr/progressBarStyleHorizontal"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="loading"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
         android:id="@+id/loading"
         app:layout_constraintTop_toBottomOf="@id/downloadVideo"
-        android:visibility="gone" />
+        android:visibility="gone"
+        android:layout_margin="8dp"
+        android:indeterminate="true" />
 
     <VideoView
         android:layout_width="match_parent"
@@ -61,4 +63,6 @@
 
 
     </ViewSwitcher>
+
+
 </androidx.constraintlayout.widget.ConstraintLayout>
